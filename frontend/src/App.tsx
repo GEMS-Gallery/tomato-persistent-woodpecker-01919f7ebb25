@@ -79,7 +79,20 @@ function App() {
 
   const updatePersonName = (id: bigint, name: string) => {
     setPeople(prevPeople =>
-      prevPeople.map(p => p.id === id ? { ...p, name, avatar: name.toLowerCase() === 'samuel' ? 'https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8' : undefined } : p)
+      prevPeople.map(p => {
+        if (p.id === id) {
+          let avatar;
+          if (name.toLowerCase() === 'samuel') {
+            avatar = 'https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8';
+          } else if (name.toLowerCase() === 'jeff') {
+            avatar = 'https://media.licdn.com/dms/image/v2/C4D03AQEEFGgOHeQT1g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1631805692690?e=1730332800&v=beta&t=DCDOHbxb2gveaupqYxb7otUd7au3NnCLoINHn7kQjyI';
+          } else {
+            avatar = undefined;
+          }
+          return { ...p, name, avatar };
+        }
+        return p;
+      })
     );
   };
 
