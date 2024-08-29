@@ -1,5 +1,6 @@
 type Person = 
  record {
+   avatar: opt text;
    id: nat;
    name: text;
    percentage: float64;
@@ -10,6 +11,7 @@ service : {
                             nat;
                             text;
                             float64;
+                            opt text;
                           }) -> (bool);
   getBillDetails: () ->
    (record {
@@ -19,5 +21,5 @@ service : {
     }) query;
   removePerson: (nat) -> (bool);
   setBillAmount: (float64) -> ();
-  updatePerson: (nat, text, float64) -> (bool);
+  updatePerson: (nat, text, float64, opt text) -> (bool);
 }

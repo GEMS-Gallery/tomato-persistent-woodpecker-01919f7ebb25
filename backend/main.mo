@@ -13,6 +13,7 @@ actor {
     id: Nat;
     name: Text;
     percentage: Float;
+    avatar: ?Text;
   };
 
   stable var billAmount: ?Float = null;
@@ -30,13 +31,14 @@ actor {
       id = id;
       name = name;
       percentage = 0;
+      avatar = null;
     };
     people.put(id, newPerson);
     nextId += 1;
     id
   };
 
-  public func updatePerson(id: Nat, name: Text, percentage: Float): async Bool {
+  public func updatePerson(id: Nat, name: Text, percentage: Float, avatar: ?Text): async Bool {
     switch (people.get(id)) {
       case (null) { false };
       case (?person) {
@@ -44,6 +46,7 @@ actor {
           id = person.id;
           name = name;
           percentage = percentage;
+          avatar = avatar;
         };
         people.put(id, updatedPerson);
         true
@@ -72,9 +75,9 @@ actor {
     }
   };
 
-  public func batchUpdatePeople(updates: [(Nat, Text, Float)]): async Bool {
-    for ((id, name, percentage) in updates.vals()) {
-      ignore await updatePerson(id, name, percentage);
+  public func batchUpdatePeople(updates: [(Nat, Text, Float, ?Text)]): async Bool {
+    for ((id, name, percentage, avatar) in updates.vals()) {
+      ignore await updatePerson(id, name, percentage, avatar);
     };
     true
   };

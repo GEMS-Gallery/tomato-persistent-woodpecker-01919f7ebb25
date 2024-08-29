@@ -3,11 +3,12 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Nat,
     'name' : IDL.Text,
     'percentage' : IDL.Float64,
+    'avatar' : IDL.Opt(IDL.Text),
   });
   return IDL.Service({
     'addPerson' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'batchUpdatePeople' : IDL.Func(
-        [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text, IDL.Float64))],
+        [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text, IDL.Float64, IDL.Opt(IDL.Text)))],
         [IDL.Bool],
         [],
       ),
@@ -24,7 +25,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'removePerson' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'setBillAmount' : IDL.Func([IDL.Float64], [], []),
-    'updatePerson' : IDL.Func([IDL.Nat, IDL.Text, IDL.Float64], [IDL.Bool], []),
+    'updatePerson' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Float64, IDL.Opt(IDL.Text)],
+        [IDL.Bool],
+        [],
+      ),
   });
 };
 export const init = ({ IDL }) => { return []; };

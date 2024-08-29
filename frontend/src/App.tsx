@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { backend } from 'declarations/backend';
-import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, IconButton, Grid } from '@mui/material';
+import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, IconButton, Grid, Avatar } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Pie } from 'react-chartjs-2';
@@ -12,6 +12,7 @@ interface Person {
   id: bigint;
   name: string;
   percentage: number;
+  avatar?: string;
 }
 
 function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
@@ -40,7 +41,7 @@ function App() {
     try {
       const details = await backend.getBillDetails();
       setBillAmount(details.billAmount[0] ? Number(details.billAmount[0]) : null);
-      setPeople(details.people.map(p => ({ ...p, id: p.id, percentage: Number(p.percentage) })));
+      setPeople(details.people.map(p => ({ ...p, id: p.id, percentage: Number(p.percentage), avatar: p.avatar[0] || undefined })));
       setTotalPercentage(Number(details.totalPercentage));
     } catch (error) {
       console.error("Error fetching bill details:", error);
@@ -78,7 +79,7 @@ function App() {
 
   const updatePersonName = (id: bigint, name: string) => {
     setPeople(prevPeople =>
-      prevPeople.map(p => p.id === id ? { ...p, name } : p)
+      prevPeople.map(p => p.id === id ? { ...p, name, avatar: name.toLowerCase() === 'samuel' ? 'https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8' : undefined } : p)
     );
   };
 
@@ -94,7 +95,7 @@ function App() {
   };
 
   const debouncedUpdateBackend = useMemo(
-    () => debounce(async (updates: [bigint, string, number][]) => {
+    () => debounce(async (updates: [bigint, string, number, string | undefined][]) => {
       try {
         await backend.batchUpdatePeople(updates);
       } catch (error) {
@@ -105,7 +106,7 @@ function App() {
   );
 
   useEffect(() => {
-    const updates = people.map(p => [p.id, p.name, p.percentage] as [bigint, string, number]);
+    const updates = people.map(p => [p.id, p.name, p.percentage, p.avatar] as [bigint, string, number, string | undefined]);
     debouncedUpdateBackend(updates);
   }, [people, debouncedUpdateBackend]);
 
@@ -183,13 +184,18 @@ function App() {
           {people.map((person) => (
             <Card key={person.id.toString()} sx={{ mt: 2 }}>
               <CardContent>
-                <TextField
-                  label="Name"
-                  value={person.name}
-                  onChange={(e) => updatePersonName(person.id, e.target.value)}
-                  fullWidth
-                  margin="normal"
-                />
+                <Box display="flex" alignItems="center">
+                  {person.avatar && (
+                    <Avatar src={person.avatar} alt={person.name} sx={{ mr: 2 }} />
+                  )}
+                  <TextField
+                    label="Name"
+                    value={person.name}
+                    onChange={(e) => updatePersonName(person.id, e.target.value)}
+                    fullWidth
+                    margin="normal"
+                  />
+                </Box>
                 <Typography id={`input-slider-${person.id}`} gutterBottom>
                   Percentage: {person.percentage}%
                 </Typography>
