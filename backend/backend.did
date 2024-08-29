@@ -1,0 +1,18 @@
+type Person = 
+ record {
+   id: nat;
+   name: text;
+   percentage: float64;
+ };
+service : {
+  addPerson: (text) -> (nat);
+  getBillDetails: () ->
+   (record {
+      billAmount: opt float64;
+      people: vec Person;
+      totalPercentage: float64;
+    }) query;
+  removePerson: (nat) -> (bool);
+  setBillAmount: (float64) -> ();
+  updatePercentage: (nat, float64) -> (bool);
+}
