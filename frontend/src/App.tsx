@@ -96,6 +96,8 @@ function App() {
             avatar = 'https://media.licdn.com/dms/image/v2/C4D03AQEEFGgOHeQT1g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1631805692690?e=1730332800&v=beta&t=DCDOHbxb2gveaupqYxb7otUd7au3NnCLoINHn7kQjyI';
           } else if (name.toLowerCase() === 'josh') {
             avatar = 'https://media.licdn.com/dms/image/v2/C5603AQGthJL_DcMSIA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1518390992422?e=1730332800&v=beta&t=FwHENS15u_vMr1BrmzIrzyw_-pJot2UyLMC7FchSILo';
+          } else if (name.toLowerCase() === 'kyle') {
+            avatar = 'https://pbs.twimg.com/profile_images/1797677925761978368/UByoyGsH_400x400.jpg';
           } else {
             avatar = undefined;
           }
