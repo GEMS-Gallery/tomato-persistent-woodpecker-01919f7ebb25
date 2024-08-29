@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { backend } from 'declarations/backend';
-import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, IconButton, Grid, Avatar } from '@mui/material';
+import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, Grid, Avatar } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import DeleteIcon from '@mui/icons-material/Delete';
 import OutdoorGrillIcon from '@mui/icons-material/OutdoorGrill';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -13,21 +12,7 @@ interface Person {
   id: bigint;
   name: string;
   percentage: number;
-  avatar?: string;
-}
-
-function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-
-  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
-    return new Promise((resolve) => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-
-      timeout = setTimeout(() => resolve(func(...args)), waitFor);
-    });
-  };
+  avatar: string;
 }
 
 function App() {
@@ -46,7 +31,6 @@ function App() {
         ...p,
         id: p.id,
         percentage: Number(p.percentage),
-        avatar: p.avatar[0] || undefined
       })));
       setTotalPercentage(Number(details.totalPercentage));
     } catch (error) {
@@ -78,69 +62,30 @@ function App() {
     }
   };
 
-  const addPerson = async () => {
+  const updatePersonPercentage = async (id: bigint, percentage: number) => {
     try {
-      const id = await backend.addPerson('');
-      setPeople(prevPeople => [...prevPeople, { id, name: '', percentage: 0 }]);
+      await backend.updatePersonPercentage(id, percentage);
+      setPeople(prevPeople => {
+        const updatedPeople = prevPeople.map(p =>
+          p.id === id ? { ...p, percentage } : p
+        );
+        const newTotalPercentage = updatedPeople.reduce((sum, p) => sum + p.percentage, 0);
+        setTotalPercentage(newTotalPercentage);
+        return updatedPeople;
+      });
     } catch (error) {
-      setSnackbarMessage("Error adding person. Please try again.");
-      setSnackbarOpen(true);
-    }
-  };
-
-  const updatePersonName = (id: bigint, name: string) => {
-    setPeople(prevPeople =>
-      prevPeople.map(p => p.id === id ? { ...p, name } : p)
-    );
-  };
-
-  const updatePersonPercentage = (id: bigint, percentage: number) => {
-    setPeople(prevPeople => {
-      const updatedPeople = prevPeople.map(p =>
-        p.id === id ? { ...p, percentage } : p
-      );
-      const newTotalPercentage = updatedPeople.reduce((sum, p) => sum + p.percentage, 0);
-      setTotalPercentage(newTotalPercentage);
-      return updatedPeople;
-    });
-  };
-
-  const debouncedUpdateBackend = useMemo(
-    () => debounce(async (updates: [bigint, string, number, string | null][]) => {
-      try {
-        await backend.batchUpdatePeople(updates);
-      } catch (error) {
-        setSnackbarMessage("Error updating people. Please try again.");
-        setSnackbarOpen(true);
-      }
-    }, 500),
-    []
-  );
-
-  useEffect(() => {
-    if (people.length > 0) {
-      const updates = people.map(p => [p.id, p.name, p.percentage, p.avatar || null] as [bigint, string, number, string | null]);
-      debouncedUpdateBackend(updates);
-    }
-  }, [people, debouncedUpdateBackend]);
-
-  const removePerson = async (id: bigint) => {
-    try {
-      await backend.removePerson(id);
-      setPeople(prevPeople => prevPeople.filter(p => p.id !== id));
-    } catch (error) {
-      setSnackbarMessage("Error removing person. Please try again.");
+      setSnackbarMessage("Error updating percentage. Please try again.");
       setSnackbarOpen(true);
     }
   };
 
   const pieChartData = {
-    labels: people.map(p => p.name || `Person ${p.id}`),
+    labels: people.map(p => p.name),
     datasets: [
       {
         data: people.map(p => p.percentage),
         backgroundColor: [
-          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
         ],
       },
     ],
@@ -160,7 +105,7 @@ function App() {
             {people.length > 0 ? (
               <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
             ) : (
-              <Typography>Add people to see the distribution</Typography>
+              <Typography>Loading...</Typography>
             )}
           </Box>
           <Box sx={{ mt: 2 }}>
@@ -188,22 +133,13 @@ function App() {
           </Box>
         </Grid>
         <Grid item xs={12} md={6} sx={{ height: '100%', overflowY: 'auto' }}>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {people.map((person) => (
-              <Card key={person.id.toString()} sx={{ width: 'calc(50% - 8px)', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-                <CardContent sx={{ p: 1 }}>
-                  <Box display="flex" alignItems="center">
-                    {person.avatar && (
-                      <Avatar src={person.avatar} alt={person.name} sx={{ width: 40, height: 40, mr: 1 }} />
-                    )}
-                    <TextField
-                      label="Name"
-                      value={person.name}
-                      onChange={(e) => updatePersonName(person.id, e.target.value)}
-                      fullWidth
-                      size="small"
-                      margin="none"
-                    />
+              <Card key={person.id.toString()} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                <CardContent sx={{ p: 2 }}>
+                  <Box display="flex" alignItems="center" mb={1}>
+                    <Avatar src={person.avatar} alt={person.name} sx={{ width: 50, height: 50, mr: 2 }} />
+                    <Typography variant="h6">{person.name}</Typography>
                   </Box>
                   <Typography variant="body2" id={`input-slider-${person.id}`} gutterBottom>
                     Share: {person.percentage}%
@@ -217,23 +153,16 @@ function App() {
                     marks
                     min={0}
                     max={100}
-                    size="small"
                   />
-                  <Typography variant="body2">
+                  <Typography variant="body1">
                     ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
                   </Typography>
-                  <IconButton onClick={() => removePerson(person.id)} size="small" sx={{ p: 0 }}>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
                 </CardContent>
               </Card>
             ))}
           </Box>
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Button onClick={addPerson} variant="contained" color="secondary" size="small">
-              Add Grillmaster
-            </Button>
-            <Typography variant="body1" color={totalPercentage === 100 ? 'primary' : 'error'}>
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+            <Typography variant="h6" color={totalPercentage === 100 ? 'primary' : 'error'}>
               Total: {totalPercentage}%
             </Typography>
           </Box>
