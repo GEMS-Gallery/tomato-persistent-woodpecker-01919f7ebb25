@@ -123,7 +123,7 @@ function App() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 2 }}>
+    <Container maxWidth="lg" sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, my: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <LocalBarIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
         <Typography variant="h4" component="h1">

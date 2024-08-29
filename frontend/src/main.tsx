@@ -14,7 +14,7 @@ const theme = createTheme({
       main: '#32CD32', // Lime green for tequila theme
     },
     background: {
-      default: '#FFF8E1', // Light warm background
+      default: 'transparent',
     },
   },
   typography: {
