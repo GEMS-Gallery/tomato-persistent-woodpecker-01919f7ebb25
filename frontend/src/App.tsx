@@ -20,20 +20,37 @@ function App() {
   }, []);
 
   const fetchBillDetails = async () => {
-    const details = await backend.getBillDetails();
-    setBillAmount(details.billAmount[0] ? Number(details.billAmount[0]) : null);
-    setPeople(details.people.map(p => ({ ...p, id: p.id, percentage: Number(p.percentage) })));
-    setTotalPercentage(Number(details.totalPercentage));
+    try {
+      const details = await backend.getBillDetails();
+      setBillAmount(details.billAmount[0] ? Number(details.billAmount[0]) : null);
+      setPeople(details.people.map(p => ({ ...p, id: p.id, percentage: Number(p.percentage) })));
+      setTotalPercentage(Number(details.totalPercentage));
+    } catch (error) {
+      console.error("Error fetching bill details:", error);
+    }
   };
 
-  const onSubmitBillAmount = async (data: { billAmount: number }) => {
-    await backend.setBillAmount(data.billAmount);
-    setBillAmount(data.billAmount);
+  const onSubmitBillAmount = async (data: { billAmount: string }) => {
+    const amount = parseFloat(data.billAmount);
+    if (isNaN(amount)) {
+      console.error("Invalid bill amount");
+      return;
+    }
+    try {
+      await backend.setBillAmount(amount);
+      setBillAmount(amount);
+    } catch (error) {
+      console.error("Error setting bill amount:", error);
+    }
   };
 
   const addPerson = async () => {
-    const id = await backend.addPerson('');
-    setPeople([...people, { id, name: '', percentage: 0 }]);
+    try {
+      const id = await backend.addPerson('');
+      setPeople([...people, { id, name: '', percentage: 0 }]);
+    } catch (error) {
+      console.error("Error adding person:", error);
+    }
   };
 
   const updatePersonName = async (id: bigint, name: string) => {
@@ -42,15 +59,28 @@ function App() {
   };
 
   const updatePersonPercentage = async (id: bigint, percentage: number) => {
-    await backend.updatePercentage(id, percentage);
-    const updatedPeople = people.map(p => p.id === id ? { ...p, percentage } : p);
-    setPeople(updatedPeople);
-    setTotalPercentage(updatedPeople.reduce((sum, p) => sum + p.percentage, 0));
+    const parsedPercentage = parseFloat(percentage.toString());
+    if (isNaN(parsedPercentage)) {
+      console.error("Invalid percentage");
+      return;
+    }
+    try {
+      await backend.updatePercentage(id, parsedPercentage);
+      const updatedPeople = people.map(p => p.id === id ? { ...p, percentage: parsedPercentage } : p);
+      setPeople(updatedPeople);
+      setTotalPercentage(updatedPeople.reduce((sum, p) => sum + p.percentage, 0));
+    } catch (error) {
+      console.error("Error updating percentage:", error);
+    }
   };
 
   const removePerson = async (id: bigint) => {
-    await backend.removePerson(id);
-    setPeople(people.filter(p => p.id !== id));
+    try {
+      await backend.removePerson(id);
+      setPeople(people.filter(p => p.id !== id));
+    } catch (error) {
+      console.error("Error removing person:", error);
+    }
   };
 
   return (
@@ -62,7 +92,7 @@ function App() {
         <Controller
           name="billAmount"
           control={control}
-          defaultValue={billAmount || ''}
+          defaultValue={billAmount?.toString() || ''}
           rules={{ required: 'Bill amount is required' }}
           render={({ field }) => (
             <TextField
