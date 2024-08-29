@@ -7,6 +7,7 @@ import Iter "mo:base/Iter";
 import HashMap "mo:base/HashMap";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
+import Option "mo:base/Option";
 
 actor {
   type Person = {

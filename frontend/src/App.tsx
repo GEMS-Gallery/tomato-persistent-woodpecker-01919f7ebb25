@@ -29,6 +29,13 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
   };
 }
 
+const defaultAvatars: { [key: string]: string } = {
+  samuel: 'https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8',
+  jeff: 'https://media.licdn.com/dms/image/v2/C4D03AQEEFGgOHeQT1g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1631805692690?e=1730332800&v=beta&t=DCDOHbxb2gveaupqYxb7otUd7au3NnCLoINHn7kQjyI',
+  josh: 'https://media.licdn.com/dms/image/v2/C5603AQGthJL_DcMSIA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1518390992422?e=1730332800&v=beta&t=FwHENS15u_vMr1BrmzIrzyw_-pJot2UyLMC7FchSILo',
+  kyle: 'https://pbs.twimg.com/profile_images/1797677925761978368/UByoyGsH_400x400.jpg'
+};
+
 function App() {
   const [billAmount, setBillAmount] = useState<number | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
@@ -41,7 +48,12 @@ function App() {
     try {
       const details = await backend.getBillDetails();
       setBillAmount(details.billAmount[0] ? Number(details.billAmount[0]) : null);
-      setPeople(details.people.map(p => ({ ...p, id: p.id, percentage: Number(p.percentage), avatar: p.avatar[0] || undefined })));
+      setPeople(details.people.map(p => ({
+        ...p,
+        id: p.id,
+        percentage: Number(p.percentage),
+        avatar: p.avatar[0] || undefined
+      })));
       setTotalPercentage(Number(details.totalPercentage));
     } catch (error) {
       console.error("Error fetching bill details:", error);
@@ -89,18 +101,8 @@ function App() {
     setPeople(prevPeople =>
       prevPeople.map(p => {
         if (p.id === id) {
-          let avatar;
-          if (name.toLowerCase() === 'samuel') {
-            avatar = 'https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8';
-          } else if (name.toLowerCase() === 'jeff') {
-            avatar = 'https://media.licdn.com/dms/image/v2/C4D03AQEEFGgOHeQT1g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1631805692690?e=1730332800&v=beta&t=DCDOHbxb2gveaupqYxb7otUd7au3NnCLoINHn7kQjyI';
-          } else if (name.toLowerCase() === 'josh') {
-            avatar = 'https://media.licdn.com/dms/image/v2/C5603AQGthJL_DcMSIA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1518390992422?e=1730332800&v=beta&t=FwHENS15u_vMr1BrmzIrzyw_-pJot2UyLMC7FchSILo';
-          } else if (name.toLowerCase() === 'kyle') {
-            avatar = 'https://pbs.twimg.com/profile_images/1797677925761978368/UByoyGsH_400x400.jpg';
-          } else {
-            avatar = undefined;
-          }
+          const lowerCaseName = name.toLowerCase();
+          const avatar = defaultAvatars[lowerCaseName] || undefined;
           return { ...p, name, avatar };
         }
         return p;
@@ -133,8 +135,10 @@ function App() {
   );
 
   useEffect(() => {
-    const updates = people.map(p => [p.id, p.name, p.percentage, p.avatar ?? null] as [bigint, string, number, string | null]);
-    debouncedUpdateBackend(updates);
+    if (people.length > 0) {
+      const updates = people.map(p => [p.id, p.name, p.percentage, p.avatar || null] as [bigint, string, number, string | null]);
+      debouncedUpdateBackend(updates);
+    }
   }, [people, debouncedUpdateBackend]);
 
   const removePerson = async (id: bigint) => {
