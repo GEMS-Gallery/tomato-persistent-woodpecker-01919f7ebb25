@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { useForm, Controller } from 'react-hook-form';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import TequilaShotIcon from './TequilaShotIcon';
+import SportsBarIcon from '@mui/icons-material/SportsBar';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -71,10 +71,10 @@ function App() {
     try {
       await backend.setBillAmount(amount);
       setBillAmount(amount);
-      setSnackbarMessage(`Tequila bill set to $${amount.toFixed(2)}`);
+      setSnackbarMessage(`Drink bill set to $${amount.toFixed(2)}`);
       setSnackbarOpen(true);
     } catch (error) {
-      setSnackbarMessage("Error setting tequila bill. Please try again.");
+      setSnackbarMessage("Error setting drink bill. Please try again.");
       setSnackbarOpen(true);
     }
   };
@@ -125,9 +125,9 @@ function App() {
   return (
     <Container maxWidth="lg" sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, my: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <TequilaShotIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
+        <SportsBarIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
         <Typography variant="h4" component="h1">
-          Tequila Drinking Bill Splitter
+          Drink Bill Splitter
         </Typography>
       </Box>
       <Grid container spacing={2}>
@@ -138,11 +138,11 @@ function App() {
                 name="billAmount"
                 control={control}
                 defaultValue={billAmount?.toString() || ''}
-                rules={{ required: 'Tequila bill amount is required' }}
+                rules={{ required: 'Drink bill amount is required' }}
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Total Tequila Bill"
+                    label="Total Drink Bill"
                     type="number"
                     fullWidth
                     size="small"
@@ -150,8 +150,8 @@ function App() {
                   />
                 )}
               />
-              <Button type="submit" variant="contained" color="primary" startIcon={<TequilaShotIcon />} fullWidth sx={{ mt: 1 }}>
-                Set Tequila Bill
+              <Button type="submit" variant="contained" color="primary" startIcon={<SportsBarIcon />} fullWidth sx={{ mt: 1 }}>
+                Set Drink Bill
               </Button>
             </form>
           </Box>
@@ -173,7 +173,7 @@ function App() {
                     <Typography variant="h6">{person.name}</Typography>
                   </Box>
                   <Typography variant="body2" id={`input-slider-${person.id}`} gutterBottom>
-                    Tequila Share: {person.percentage}%
+                    Drink Share: {person.percentage}%
                   </Typography>
                   <Slider
                     value={person.percentage}
@@ -195,7 +195,7 @@ function App() {
           </Box>
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
             <Typography variant="h6" color={totalPercentage === 100 ? 'primary' : 'error'}>
-              Total Tequila Share: {totalPercentage}%
+              Total Drink Share: {totalPercentage}%
             </Typography>
           </Box>
         </Grid>

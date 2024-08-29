@@ -8,10 +8,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FFD700', // Gold color for tequila theme
+      main: '#FFD700', // Gold color for drink theme
     },
     secondary: {
-      main: '#32CD32', // Lime green for tequila theme
+      main: '#32CD32', // Lime green for drink theme
     },
     background: {
       default: 'transparent',

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Beer Icon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="beer-icon" fill="#FFD700" fill-rule="nonzero">
+            <path d="M4,2h15l-2,20H6L4,2z M6.2,4l1.8,16h1l-1.8-16H6.2z M19.8,4h-1l-1.8,16h1L19.8,4z M11,13v-3H9v3H11z M13,13h2v-3h-2V13z" id="Shape"></path>
+        </g>
+    </g>
+</svg>
