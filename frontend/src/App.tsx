@@ -3,6 +3,7 @@ import { backend } from 'declarations/backend';
 import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, IconButton, Grid, Avatar } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import DeleteIcon from '@mui/icons-material/Delete';
+import OutdoorGrillIcon from '@mui/icons-material/OutdoorGrill';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -28,13 +29,6 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
     });
   };
 }
-
-const defaultAvatars: { [key: string]: string } = {
-  samuel: 'https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8',
-  jeff: 'https://media.licdn.com/dms/image/v2/C4D03AQEEFGgOHeQT1g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1631805692690?e=1730332800&v=beta&t=DCDOHbxb2gveaupqYxb7otUd7au3NnCLoINHn7kQjyI',
-  josh: 'https://media.licdn.com/dms/image/v2/C5603AQGthJL_DcMSIA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1518390992422?e=1730332800&v=beta&t=FwHENS15u_vMr1BrmzIrzyw_-pJot2UyLMC7FchSILo',
-  kyle: 'https://pbs.twimg.com/profile_images/1797677925761978368/UByoyGsH_400x400.jpg'
-};
 
 function App() {
   const [billAmount, setBillAmount] = useState<number | null>(null);
@@ -99,14 +93,7 @@ function App() {
 
   const updatePersonName = (id: bigint, name: string) => {
     setPeople(prevPeople =>
-      prevPeople.map(p => {
-        if (p.id === id) {
-          const lowerCaseName = name.toLowerCase();
-          const avatar = defaultAvatars[lowerCaseName] || undefined;
-          return { ...p, name, avatar };
-        }
-        return p;
-      })
+      prevPeople.map(p => p.id === id ? { ...p, name } : p)
     );
   };
 
@@ -179,9 +166,12 @@ function App() {
 
   return (
     <Container maxWidth="lg">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Bill Splitting App
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <OutdoorGrillIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+        <Typography variant="h4" component="h1" gutterBottom>
+          BBQ Dinner Bill Splitter
+        </Typography>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <Box sx={{ height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -202,7 +192,7 @@ function App() {
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Total Bill Amount"
+                  label="Total BBQ Bill"
                   type="number"
                   fullWidth
                   margin="normal"
@@ -210,19 +200,19 @@ function App() {
                 />
               )}
             />
-            <Button type="submit" variant="contained" color="primary">
-              Set Bill Amount
+            <Button type="submit" variant="contained" color="primary" startIcon={<OutdoorGrillIcon />}>
+              Set BBQ Bill
             </Button>
           </form>
           {people.map((person) => (
-            <Card key={person.id.toString()} sx={{ mt: 2 }}>
+            <Card key={person.id.toString()} sx={{ mt: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
               <CardContent>
                 <Box display="flex" alignItems="center">
                   {person.avatar && (
-                    <Avatar src={person.avatar} alt={person.name} sx={{ mr: 2 }} />
+                    <Avatar src={person.avatar} alt={person.name} sx={{ mr: 2, width: 56, height: 56 }} />
                   )}
                   <TextField
-                    label="Name"
+                    label="Grillmaster's Name"
                     value={person.name}
                     onChange={(e) => updatePersonName(person.id, e.target.value)}
                     fullWidth
@@ -230,7 +220,7 @@ function App() {
                   />
                 </Box>
                 <Typography id={`input-slider-${person.id}`} gutterBottom>
-                  Percentage: {person.percentage}%
+                  Share of the Feast: {person.percentage}%
                 </Typography>
                 <Slider
                   value={person.percentage}
@@ -243,7 +233,7 @@ function App() {
                   max={100}
                 />
                 <Typography variant="body2">
-                  Amount: ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
+                  Contribution: ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
                 </Typography>
                 <IconButton onClick={() => removePerson(person.id)} color="secondary">
                   <DeleteIcon />
@@ -252,11 +242,11 @@ function App() {
             </Card>
           ))}
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Button onClick={addPerson} variant="contained" color="primary">
-              Add Person
+            <Button onClick={addPerson} variant="contained" color="secondary">
+              Add Grillmaster
             </Button>
             <Typography variant="h6" color={totalPercentage === 100 ? 'primary' : 'error'}>
-              Total: {totalPercentage}%
+              Total Share: {totalPercentage}%
             </Typography>
           </Box>
         </Grid>

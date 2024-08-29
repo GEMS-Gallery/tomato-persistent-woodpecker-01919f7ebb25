@@ -8,13 +8,19 @@ import CssBaseline from '@mui/material/CssBaseline';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#3f51b5',
+      main: '#FF4136', // A vibrant red for BBQ theme
     },
     secondary: {
-      main: '#f50057',
+      main: '#FF851B', // A warm orange for BBQ theme
     },
     background: {
-      default: '#f5f5f5',
+      default: '#FFF9C4', // A light yellow for a warm, outdoor feel
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h4: {
+      fontWeight: 700,
     },
   },
 });

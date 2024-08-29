@@ -83,14 +83,37 @@ actor {
     true
   };
 
+  private func initializeDefaultPeople() {
+    let defaultPeople = [
+      ("Samuel", "https://media.licdn.com/dms/image/v2/C4D03AQEWyMuV3rjZ-Q/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1593372307660?e=1730332800&v=beta&t=8-2_YMJK_oB6JVj1TxlgS60Y_5OpTpGCKHr9mdiVEv8"),
+      ("Jeff", "https://media.licdn.com/dms/image/v2/C4D03AQEEFGgOHeQT1g/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1631805692690?e=1730332800&v=beta&t=DCDOHbxb2gveaupqYxb7otUd7au3NnCLoINHn7kQjyI"),
+      ("Josh", "https://media.licdn.com/dms/image/v2/C5603AQGthJL_DcMSIA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1518390992422?e=1730332800&v=beta&t=FwHENS15u_vMr1BrmzIrzyw_-pJot2UyLMC7FchSILo"),
+      ("Kyle", "https://pbs.twimg.com/profile_images/1797677925761978368/UByoyGsH_400x400.jpg")
+    ];
+
+    for ((name, avatar) in defaultPeople.vals()) {
+      let id = nextId;
+      let newPerson: Person = {
+        id = id;
+        name = name;
+        percentage = 0;
+        avatar = ?avatar;
+      };
+      people.put(id, newPerson);
+      nextId += 1;
+    };
+  };
+
   system func preupgrade() {
     peopleEntries := Iter.toArray(people.entries());
   };
 
   system func postupgrade() {
     people := HashMap.fromIter<Nat, Person>(peopleEntries.vals(), 10, Nat.equal, Nat.hash);
-    if (peopleEntries.size() > 0) {
-      nextId := peopleEntries[peopleEntries.size() - 1].0 + 1;
+    if (peopleEntries.size() == 0) {
+      initializeDefaultPeople();
+    } else {
+      nextId := peopleEntries.size();
     };
   };
 }
