@@ -45,6 +45,8 @@ function App() {
       setTotalPercentage(Number(details.totalPercentage));
     } catch (error) {
       console.error("Error fetching bill details:", error);
+      setSnackbarMessage("Error fetching bill details. Please try again.");
+      setSnackbarOpen(true);
     }
   }, []);
 
@@ -56,6 +58,8 @@ function App() {
     const amount = parseFloat(data.billAmount);
     if (isNaN(amount)) {
       console.error("Invalid bill amount");
+      setSnackbarMessage("Invalid bill amount. Please enter a valid number.");
+      setSnackbarOpen(true);
       return;
     }
     try {
@@ -65,6 +69,8 @@ function App() {
       setSnackbarOpen(true);
     } catch (error) {
       console.error("Error setting bill amount:", error);
+      setSnackbarMessage("Error setting bill amount. Please try again.");
+      setSnackbarOpen(true);
     }
   };
 
@@ -74,6 +80,8 @@ function App() {
       setPeople(prevPeople => [...prevPeople, { id, name: '', percentage: 0 }]);
     } catch (error) {
       console.error("Error adding person:", error);
+      setSnackbarMessage("Error adding person. Please try again.");
+      setSnackbarOpen(true);
     }
   };
 
@@ -108,18 +116,20 @@ function App() {
   };
 
   const debouncedUpdateBackend = useMemo(
-    () => debounce(async (updates: [bigint, string, number, string | undefined][]) => {
+    () => debounce(async (updates: [bigint, string, number, string | null][]) => {
       try {
         await backend.batchUpdatePeople(updates);
       } catch (error) {
         console.error("Error updating people:", error);
+        setSnackbarMessage("Error updating people. Please try again.");
+        setSnackbarOpen(true);
       }
     }, 500),
     []
   );
 
   useEffect(() => {
-    const updates = people.map(p => [p.id, p.name, p.percentage, p.avatar] as [bigint, string, number, string | undefined]);
+    const updates = people.map(p => [p.id, p.name, p.percentage, p.avatar ?? null] as [bigint, string, number, string | null]);
     debouncedUpdateBackend(updates);
   }, [people, debouncedUpdateBackend]);
 
@@ -129,6 +139,8 @@ function App() {
       setPeople(prevPeople => prevPeople.filter(p => p.id !== id));
     } catch (error) {
       console.error("Error removing person:", error);
+      setSnackbarMessage("Error removing person. Please try again.");
+      setSnackbarOpen(true);
     }
   };
 
