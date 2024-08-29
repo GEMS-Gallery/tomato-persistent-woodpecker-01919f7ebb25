@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { backend } from 'declarations/backend';
-import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, Grid, Avatar } from '@mui/material';
+import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, Grid, Avatar, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { useForm, Controller } from 'react-hook-form';
 import OutdoorGrillIcon from '@mui/icons-material/OutdoorGrill';
 import { Pie } from 'react-chartjs-2';
@@ -36,6 +37,8 @@ function App() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const { control, handleSubmit } = useForm();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const fetchBillDetails = useCallback(async () => {
     try {
@@ -120,23 +123,16 @@ function App() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ height: '100vh', py: 2 }}>
+    <Container maxWidth="lg" sx={{ py: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <OutdoorGrillIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
         <Typography variant="h4" component="h1">
           BBQ Dinner Bill Splitter
         </Typography>
       </Box>
-      <Grid container spacing={2} sx={{ height: 'calc(100% - 60px)' }}>
-        <Grid item xs={12} md={6} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            {people.length > 0 ? (
-              <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
-            ) : (
-              <Typography>Loading...</Typography>
-            )}
-          </Box>
-          <Box sx={{ mt: 2 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <Box sx={{ mb: 2 }}>
             <form onSubmit={handleSubmit(onSubmitBillAmount)}>
               <Controller
                 name="billAmount"
@@ -159,14 +155,21 @@ function App() {
               </Button>
             </form>
           </Box>
+          <Box sx={{ height: isMobile ? '200px' : '300px', mb: 2 }}>
+            {people.length > 0 ? (
+              <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+            ) : (
+              <Typography>Loading...</Typography>
+            )}
+          </Box>
         </Grid>
-        <Grid item xs={12} md={6} sx={{ height: '100%', overflowY: 'auto' }}>
+        <Grid item xs={12} md={6}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {people.map((person) => (
               <Card key={person.id.toString()} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
                 <CardContent sx={{ p: 2 }}>
                   <Box display="flex" alignItems="center" mb={1}>
-                    <Avatar src={person.avatar} alt={person.name} sx={{ width: 50, height: 50, mr: 2 }} />
+                    <Avatar src={person.avatar} alt={person.name} sx={{ width: 40, height: 40, mr: 2 }} />
                     <Typography variant="h6">{person.name}</Typography>
                   </Box>
                   <Typography variant="body2" id={`input-slider-${person.id}`} gutterBottom>
@@ -181,6 +184,7 @@ function App() {
                     marks
                     min={0}
                     max={100}
+                    sx={{ '& .MuiSlider-thumb': { width: 24, height: 24 }, '& .MuiSlider-rail': { height: 8 } }}
                   />
                   <Typography variant="body1">
                     ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
