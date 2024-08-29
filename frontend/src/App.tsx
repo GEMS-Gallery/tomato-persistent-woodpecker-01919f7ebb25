@@ -63,7 +63,6 @@ function App() {
   const onSubmitBillAmount = async (data: { billAmount: string }) => {
     const amount = parseFloat(data.billAmount);
     if (isNaN(amount)) {
-      console.error("Invalid bill amount");
       setSnackbarMessage("Invalid bill amount. Please enter a valid number.");
       setSnackbarOpen(true);
       return;
@@ -74,7 +73,6 @@ function App() {
       setSnackbarMessage(`Bill amount set to $${amount.toFixed(2)}`);
       setSnackbarOpen(true);
     } catch (error) {
-      console.error("Error setting bill amount:", error);
       setSnackbarMessage("Error setting bill amount. Please try again.");
       setSnackbarOpen(true);
     }
@@ -85,7 +83,6 @@ function App() {
       const id = await backend.addPerson('');
       setPeople(prevPeople => [...prevPeople, { id, name: '', percentage: 0 }]);
     } catch (error) {
-      console.error("Error adding person:", error);
       setSnackbarMessage("Error adding person. Please try again.");
       setSnackbarOpen(true);
     }
@@ -113,7 +110,6 @@ function App() {
       try {
         await backend.batchUpdatePeople(updates);
       } catch (error) {
-        console.error("Error updating people:", error);
         setSnackbarMessage("Error updating people. Please try again.");
         setSnackbarOpen(true);
       }
@@ -133,7 +129,6 @@ function App() {
       await backend.removePerson(id);
       setPeople(prevPeople => prevPeople.filter(p => p.id !== id));
     } catch (error) {
-      console.error("Error removing person:", error);
       setSnackbarMessage("Error removing person. Please try again.");
       setSnackbarOpen(true);
     }
@@ -145,108 +140,101 @@ function App() {
       {
         data: people.map(p => p.percentage),
         backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF',
-          '#FF9F40',
-        ],
-        hoverBackgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF',
-          '#FF9F40',
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
         ],
       },
     ],
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ height: '100vh', py: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <OutdoorGrillIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-        <Typography variant="h4" component="h1" gutterBottom>
+        <OutdoorGrillIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
+        <Typography variant="h4" component="h1">
           BBQ Dinner Bill Splitter
         </Typography>
       </Box>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Box sx={{ height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Grid container spacing={2} sx={{ height: 'calc(100% - 60px)' }}>
+        <Grid item xs={12} md={6} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             {people.length > 0 ? (
               <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
             ) : (
               <Typography>Add people to see the distribution</Typography>
             )}
           </Box>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <form onSubmit={handleSubmit(onSubmitBillAmount)}>
-            <Controller
-              name="billAmount"
-              control={control}
-              defaultValue={billAmount?.toString() || ''}
-              rules={{ required: 'Bill amount is required' }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Total BBQ Bill"
-                  type="number"
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                />
-              )}
-            />
-            <Button type="submit" variant="contained" color="primary" startIcon={<OutdoorGrillIcon />}>
-              Set BBQ Bill
-            </Button>
-          </form>
-          {people.map((person) => (
-            <Card key={person.id.toString()} sx={{ mt: 2, backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-              <CardContent>
-                <Box display="flex" alignItems="center">
-                  {person.avatar && (
-                    <Avatar src={person.avatar} alt={person.name} sx={{ mr: 2, width: 56, height: 56 }} />
-                  )}
+          <Box sx={{ mt: 2 }}>
+            <form onSubmit={handleSubmit(onSubmitBillAmount)}>
+              <Controller
+                name="billAmount"
+                control={control}
+                defaultValue={billAmount?.toString() || ''}
+                rules={{ required: 'Bill amount is required' }}
+                render={({ field }) => (
                   <TextField
-                    label="Grillmaster's Name"
-                    value={person.name}
-                    onChange={(e) => updatePersonName(person.id, e.target.value)}
+                    {...field}
+                    label="Total BBQ Bill"
+                    type="number"
                     fullWidth
-                    margin="normal"
+                    size="small"
+                    variant="outlined"
                   />
-                </Box>
-                <Typography id={`input-slider-${person.id}`} gutterBottom>
-                  Share of the Feast: {person.percentage}%
-                </Typography>
-                <Slider
-                  value={person.percentage}
-                  onChange={(_, newValue) => updatePersonPercentage(person.id, newValue as number)}
-                  aria-labelledby={`input-slider-${person.id}`}
-                  valueLabelDisplay="auto"
-                  step={1}
-                  marks
-                  min={0}
-                  max={100}
-                />
-                <Typography variant="body2">
-                  Contribution: ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
-                </Typography>
-                <IconButton onClick={() => removePerson(person.id)} color="secondary">
-                  <DeleteIcon />
-                </IconButton>
-              </CardContent>
-            </Card>
-          ))}
+                )}
+              />
+              <Button type="submit" variant="contained" color="primary" startIcon={<OutdoorGrillIcon />} fullWidth sx={{ mt: 1 }}>
+                Set BBQ Bill
+              </Button>
+            </form>
+          </Box>
+        </Grid>
+        <Grid item xs={12} md={6} sx={{ height: '100%', overflowY: 'auto' }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            {people.map((person) => (
+              <Card key={person.id.toString()} sx={{ width: 'calc(50% - 8px)', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+                <CardContent sx={{ p: 1 }}>
+                  <Box display="flex" alignItems="center">
+                    {person.avatar && (
+                      <Avatar src={person.avatar} alt={person.name} sx={{ width: 40, height: 40, mr: 1 }} />
+                    )}
+                    <TextField
+                      label="Name"
+                      value={person.name}
+                      onChange={(e) => updatePersonName(person.id, e.target.value)}
+                      fullWidth
+                      size="small"
+                      margin="none"
+                    />
+                  </Box>
+                  <Typography variant="body2" id={`input-slider-${person.id}`} gutterBottom>
+                    Share: {person.percentage}%
+                  </Typography>
+                  <Slider
+                    value={person.percentage}
+                    onChange={(_, newValue) => updatePersonPercentage(person.id, newValue as number)}
+                    aria-labelledby={`input-slider-${person.id}`}
+                    valueLabelDisplay="auto"
+                    step={1}
+                    marks
+                    min={0}
+                    max={100}
+                    size="small"
+                  />
+                  <Typography variant="body2">
+                    ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
+                  </Typography>
+                  <IconButton onClick={() => removePerson(person.id)} size="small" sx={{ p: 0 }}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Button onClick={addPerson} variant="contained" color="secondary">
+            <Button onClick={addPerson} variant="contained" color="secondary" size="small">
               Add Grillmaster
             </Button>
-            <Typography variant="h6" color={totalPercentage === 100 ? 'primary' : 'error'}>
-              Total Share: {totalPercentage}%
+            <Typography variant="body1" color={totalPercentage === 100 ? 'primary' : 'error'}>
+              Total: {totalPercentage}%
             </Typography>
           </Box>
         </Grid>

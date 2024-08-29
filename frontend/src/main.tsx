@@ -8,19 +8,43 @@ import CssBaseline from '@mui/material/CssBaseline';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FF4136', // A vibrant red for BBQ theme
+      main: '#FF4136',
     },
     secondary: {
-      main: '#FF851B', // A warm orange for BBQ theme
+      main: '#FF851B',
     },
     background: {
-      default: '#FFF9C4', // A light yellow for a warm, outdoor feel
+      default: '#FFF9C4',
     },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h4: {
       fontWeight: 700,
+      fontSize: '1.5rem',
+    },
+    body1: {
+      fontSize: '0.9rem',
+    },
+    body2: {
+      fontSize: '0.8rem',
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontSize: '0.8rem',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          marginTop: '8px',
+          marginBottom: '8px',
+        },
+      },
     },
   },
 });
