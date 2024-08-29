@@ -6,6 +6,11 @@ export const idlFactory = ({ IDL }) => {
     'avatar' : IDL.Text,
   });
   return IDL.Service({
+    'batchUpdatePercentages' : IDL.Func(
+        [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Float64))],
+        [IDL.Bool],
+        [],
+      ),
     'getBillDetails' : IDL.Func(
         [],
         [
@@ -18,7 +23,6 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'setBillAmount' : IDL.Func([IDL.Float64], [], []),
-    'updatePersonPercentage' : IDL.Func([IDL.Nat, IDL.Float64], [IDL.Bool], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

@@ -25,20 +25,22 @@ actor {
     billAmount := ?amount;
   };
 
-  public func updatePersonPercentage(id: Nat, percentage: Float): async Bool {
-    switch (people.get(id)) {
-      case (null) { false };
-      case (?person) {
-        let updatedPerson: Person = {
-          id = person.id;
-          name = person.name;
-          percentage = percentage;
-          avatar = person.avatar;
+  public func batchUpdatePercentages(updates: [(Nat, Float)]): async Bool {
+    for ((id, percentage) in updates.vals()) {
+      switch (people.get(id)) {
+        case (null) { return false; };
+        case (?person) {
+          let updatedPerson: Person = {
+            id = person.id;
+            name = person.name;
+            percentage = percentage;
+            avatar = person.avatar;
+          };
+          people.put(id, updatedPerson);
         };
-        people.put(id, updatedPerson);
-        true
       };
-    }
+    };
+    true
   };
 
   public query func getBillDetails(): async {

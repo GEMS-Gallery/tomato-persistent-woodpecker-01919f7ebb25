@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { backend } from 'declarations/backend';
 import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, Grid, Avatar } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
@@ -13,6 +13,20 @@ interface Person {
   name: string;
   percentage: number;
   avatar: string;
+}
+
+function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+    return new Promise((resolve) => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+
+      timeout = setTimeout(() => resolve(func(...args)), waitFor);
+    });
+  };
 }
 
 function App() {
@@ -62,22 +76,36 @@ function App() {
     }
   };
 
-  const updatePersonPercentage = async (id: bigint, percentage: number) => {
-    try {
-      await backend.updatePersonPercentage(id, percentage);
-      setPeople(prevPeople => {
-        const updatedPeople = prevPeople.map(p =>
-          p.id === id ? { ...p, percentage } : p
-        );
-        const newTotalPercentage = updatedPeople.reduce((sum, p) => sum + p.percentage, 0);
-        setTotalPercentage(newTotalPercentage);
-        return updatedPeople;
-      });
-    } catch (error) {
-      setSnackbarMessage("Error updating percentage. Please try again.");
-      setSnackbarOpen(true);
-    }
+  const updatePersonPercentage = (id: bigint, percentage: number) => {
+    setPeople(prevPeople => {
+      const updatedPeople = prevPeople.map(p =>
+        p.id === id ? { ...p, percentage } : p
+      );
+      const newTotalPercentage = updatedPeople.reduce((sum, p) => sum + p.percentage, 0);
+      setTotalPercentage(newTotalPercentage);
+      return updatedPeople;
+    });
   };
+
+  const debouncedUpdateBackend = useMemo(
+    () => debounce(async (updates: [bigint, number][]) => {
+      try {
+        await backend.batchUpdatePercentages(updates);
+      } catch (error) {
+        console.error("Error updating percentages:", error);
+        setSnackbarMessage("Error updating percentages. Please try again.");
+        setSnackbarOpen(true);
+      }
+    }, 500),
+    []
+  );
+
+  useEffect(() => {
+    if (people.length > 0) {
+      const updates = people.map(p => [p.id, p.percentage] as [bigint, number]);
+      debouncedUpdateBackend(updates);
+    }
+  }, [people, debouncedUpdateBackend]);
 
   const pieChartData = {
     labels: people.map(p => p.name),
