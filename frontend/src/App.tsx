@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { backend } from 'declarations/backend';
-import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box } from '@mui/material';
+import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, IconButton } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Person {
   id: bigint;
@@ -27,6 +28,8 @@ function App() {
   const [billAmount, setBillAmount] = useState<number | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
   const [totalPercentage, setTotalPercentage] = useState(0);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const { control, handleSubmit } = useForm();
 
   const fetchBillDetails = useCallback(async () => {
@@ -53,6 +56,8 @@ function App() {
     try {
       await backend.setBillAmount(amount);
       setBillAmount(amount);
+      setSnackbarMessage(`Bill amount set to $${amount.toFixed(2)}`);
+      setSnackbarOpen(true);
     } catch (error) {
       console.error("Error setting bill amount:", error);
     }
@@ -161,9 +166,9 @@ function App() {
             <Typography variant="body2">
               Amount: ${billAmount ? ((billAmount * person.percentage) / 100).toFixed(2) : '0.00'}
             </Typography>
-            <Button onClick={() => removePerson(person.id)} color="secondary">
-              Remove
-            </Button>
+            <IconButton onClick={() => removePerson(person.id)} color="secondary">
+              <DeleteIcon />
+            </IconButton>
           </CardContent>
         </Card>
       ))}
@@ -175,6 +180,12 @@ function App() {
           Total: {totalPercentage}%
         </Typography>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+      />
     </Container>
   );
 }
