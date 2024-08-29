@@ -3,9 +3,9 @@ import { backend } from 'declarations/backend';
 import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, Grid, Avatar, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useForm, Controller } from 'react-hook-form';
-import LocalBarIcon from '@mui/icons-material/LocalBar';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import TequilaShotIcon from './TequilaShotIcon';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -125,7 +125,7 @@ function App() {
   return (
     <Container maxWidth="lg" sx={{ py: 2, backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, my: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <LocalBarIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
+        <TequilaShotIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
         <Typography variant="h4" component="h1">
           Tequila Drinking Bill Splitter
         </Typography>
@@ -150,7 +150,7 @@ function App() {
                   />
                 )}
               />
-              <Button type="submit" variant="contained" color="primary" startIcon={<LocalBarIcon />} fullWidth sx={{ mt: 1 }}>
+              <Button type="submit" variant="contained" color="primary" startIcon={<TequilaShotIcon />} fullWidth sx={{ mt: 1 }}>
                 Set Tequila Bill
               </Button>
             </form>
