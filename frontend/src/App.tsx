@@ -3,7 +3,7 @@ import { backend } from 'declarations/backend';
 import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box, Snackbar, Grid, Avatar, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useForm, Controller } from 'react-hook-form';
-import OutdoorGrillIcon from '@mui/icons-material/OutdoorGrill';
+import LocalBarIcon from '@mui/icons-material/LocalBar';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -71,10 +71,10 @@ function App() {
     try {
       await backend.setBillAmount(amount);
       setBillAmount(amount);
-      setSnackbarMessage(`Bill amount set to $${amount.toFixed(2)}`);
+      setSnackbarMessage(`Tequila bill set to $${amount.toFixed(2)}`);
       setSnackbarOpen(true);
     } catch (error) {
-      setSnackbarMessage("Error setting bill amount. Please try again.");
+      setSnackbarMessage("Error setting tequila bill. Please try again.");
       setSnackbarOpen(true);
     }
   };
@@ -116,7 +116,7 @@ function App() {
       {
         data: people.map(p => p.percentage),
         backgroundColor: [
-          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+          '#FFD700', '#32CD32', '#FF6384', '#36A2EB',
         ],
       },
     ],
@@ -125,9 +125,9 @@ function App() {
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <OutdoorGrillIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
+        <LocalBarIcon sx={{ fontSize: 30, mr: 1, color: 'primary.main' }} />
         <Typography variant="h4" component="h1">
-          BBQ Dinner Bill Splitter
+          Tequila Drinking Bill Splitter
         </Typography>
       </Box>
       <Grid container spacing={2}>
@@ -138,11 +138,11 @@ function App() {
                 name="billAmount"
                 control={control}
                 defaultValue={billAmount?.toString() || ''}
-                rules={{ required: 'Bill amount is required' }}
+                rules={{ required: 'Tequila bill amount is required' }}
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Total BBQ Bill"
+                    label="Total Tequila Bill"
                     type="number"
                     fullWidth
                     size="small"
@@ -150,8 +150,8 @@ function App() {
                   />
                 )}
               />
-              <Button type="submit" variant="contained" color="primary" startIcon={<OutdoorGrillIcon />} fullWidth sx={{ mt: 1 }}>
-                Set BBQ Bill
+              <Button type="submit" variant="contained" color="primary" startIcon={<LocalBarIcon />} fullWidth sx={{ mt: 1 }}>
+                Set Tequila Bill
               </Button>
             </form>
           </Box>
@@ -173,7 +173,7 @@ function App() {
                     <Typography variant="h6">{person.name}</Typography>
                   </Box>
                   <Typography variant="body2" id={`input-slider-${person.id}`} gutterBottom>
-                    Share: {person.percentage}%
+                    Tequila Share: {person.percentage}%
                   </Typography>
                   <Slider
                     value={person.percentage}
@@ -195,7 +195,7 @@ function App() {
           </Box>
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
             <Typography variant="h6" color={totalPercentage === 100 ? 'primary' : 'error'}>
-              Total: {totalPercentage}%
+              Total Tequila Share: {totalPercentage}%
             </Typography>
           </Box>
         </Grid>

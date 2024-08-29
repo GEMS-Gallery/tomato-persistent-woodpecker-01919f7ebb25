@@ -8,13 +8,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FF4136',
+      main: '#FFD700', // Gold color for tequila theme
     },
     secondary: {
-      main: '#FF851B',
+      main: '#32CD32', // Lime green for tequila theme
     },
     background: {
-      default: '#FFF9C4',
+      default: '#FFF8E1', // Light warm background
     },
   },
   typography: {
