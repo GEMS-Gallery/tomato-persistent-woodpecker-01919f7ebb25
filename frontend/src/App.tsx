@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { backend } from 'declarations/backend';
 import { Container, Typography, TextField, Button, Slider, Card, CardContent, Box } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
@@ -9,17 +9,27 @@ interface Person {
   percentage: number;
 }
 
+function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+    return new Promise((resolve) => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+
+      timeout = setTimeout(() => resolve(func(...args)), waitFor);
+    });
+  };
+}
+
 function App() {
   const [billAmount, setBillAmount] = useState<number | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
   const [totalPercentage, setTotalPercentage] = useState(0);
   const { control, handleSubmit } = useForm();
 
-  useEffect(() => {
-    fetchBillDetails();
-  }, []);
-
-  const fetchBillDetails = async () => {
+  const fetchBillDetails = useCallback(async () => {
     try {
       const details = await backend.getBillDetails();
       setBillAmount(details.billAmount[0] ? Number(details.billAmount[0]) : null);
@@ -28,7 +38,11 @@ function App() {
     } catch (error) {
       console.error("Error fetching bill details:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchBillDetails();
+  }, [fetchBillDetails]);
 
   const onSubmitBillAmount = async (data: { billAmount: string }) => {
     const amount = parseFloat(data.billAmount);
@@ -47,37 +61,49 @@ function App() {
   const addPerson = async () => {
     try {
       const id = await backend.addPerson('');
-      setPeople([...people, { id, name: '', percentage: 0 }]);
+      setPeople(prevPeople => [...prevPeople, { id, name: '', percentage: 0 }]);
     } catch (error) {
       console.error("Error adding person:", error);
     }
   };
 
-  const updatePersonName = async (id: bigint, name: string) => {
-    const updatedPeople = people.map(p => p.id === id ? { ...p, name } : p);
-    setPeople(updatedPeople);
+  const updatePersonName = (id: bigint, name: string) => {
+    setPeople(prevPeople =>
+      prevPeople.map(p => p.id === id ? { ...p, name } : p)
+    );
   };
 
-  const updatePersonPercentage = async (id: bigint, percentage: number) => {
-    const parsedPercentage = parseFloat(percentage.toString());
-    if (isNaN(parsedPercentage)) {
-      console.error("Invalid percentage");
-      return;
-    }
-    try {
-      await backend.updatePercentage(id, parsedPercentage);
-      const updatedPeople = people.map(p => p.id === id ? { ...p, percentage: parsedPercentage } : p);
-      setPeople(updatedPeople);
-      setTotalPercentage(updatedPeople.reduce((sum, p) => sum + p.percentage, 0));
-    } catch (error) {
-      console.error("Error updating percentage:", error);
-    }
+  const updatePersonPercentage = (id: bigint, percentage: number) => {
+    setPeople(prevPeople => {
+      const updatedPeople = prevPeople.map(p =>
+        p.id === id ? { ...p, percentage } : p
+      );
+      const newTotalPercentage = updatedPeople.reduce((sum, p) => sum + p.percentage, 0);
+      setTotalPercentage(newTotalPercentage);
+      return updatedPeople;
+    });
   };
+
+  const debouncedUpdateBackend = useMemo(
+    () => debounce(async (updates: [bigint, string, number][]) => {
+      try {
+        await backend.batchUpdatePeople(updates);
+      } catch (error) {
+        console.error("Error updating people:", error);
+      }
+    }, 500),
+    []
+  );
+
+  useEffect(() => {
+    const updates = people.map(p => [p.id, p.name, p.percentage] as [bigint, string, number]);
+    debouncedUpdateBackend(updates);
+  }, [people, debouncedUpdateBackend]);
 
   const removePerson = async (id: bigint) => {
     try {
       await backend.removePerson(id);
-      setPeople(people.filter(p => p.id !== id));
+      setPeople(prevPeople => prevPeople.filter(p => p.id !== id));
     } catch (error) {
       console.error("Error removing person:", error);
     }

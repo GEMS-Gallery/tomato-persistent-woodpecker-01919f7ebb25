@@ -36,13 +36,13 @@ actor {
     id
   };
 
-  public func updatePercentage(id: Nat, percentage: Float): async Bool {
+  public func updatePerson(id: Nat, name: Text, percentage: Float): async Bool {
     switch (people.get(id)) {
       case (null) { false };
       case (?person) {
         let updatedPerson: Person = {
           id = person.id;
-          name = person.name;
+          name = name;
           percentage = percentage;
         };
         people.put(id, updatedPerson);
@@ -70,6 +70,13 @@ actor {
       people = peopleArray;
       totalPercentage = totalPercentage;
     }
+  };
+
+  public func batchUpdatePeople(updates: [(Nat, Text, Float)]): async Bool {
+    for ((id, name, percentage) in updates.vals()) {
+      ignore await updatePerson(id, name, percentage);
+    };
+    true
   };
 
   system func preupgrade() {

@@ -9,6 +9,7 @@ export interface Person {
 }
 export interface _SERVICE {
   'addPerson' : ActorMethod<[string], bigint>,
+  'batchUpdatePeople' : ActorMethod<[Array<[bigint, string, number]>], boolean>,
   'getBillDetails' : ActorMethod<
     [],
     {
@@ -19,7 +20,7 @@ export interface _SERVICE {
   >,
   'removePerson' : ActorMethod<[bigint], boolean>,
   'setBillAmount' : ActorMethod<[number], undefined>,
-  'updatePercentage' : ActorMethod<[bigint, number], boolean>,
+  'updatePerson' : ActorMethod<[bigint, string, number], boolean>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

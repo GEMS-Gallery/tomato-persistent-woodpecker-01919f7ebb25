@@ -6,6 +6,11 @@ export const idlFactory = ({ IDL }) => {
   });
   return IDL.Service({
     'addPerson' : IDL.Func([IDL.Text], [IDL.Nat], []),
+    'batchUpdatePeople' : IDL.Func(
+        [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text, IDL.Float64))],
+        [IDL.Bool],
+        [],
+      ),
     'getBillDetails' : IDL.Func(
         [],
         [
@@ -19,7 +24,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'removePerson' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'setBillAmount' : IDL.Func([IDL.Float64], [], []),
-    'updatePercentage' : IDL.Func([IDL.Nat, IDL.Float64], [IDL.Bool], []),
+    'updatePerson' : IDL.Func([IDL.Nat, IDL.Text, IDL.Float64], [IDL.Bool], []),
   });
 };
 export const init = ({ IDL }) => { return []; };

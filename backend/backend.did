@@ -6,6 +6,11 @@ type Person =
  };
 service : {
   addPerson: (text) -> (nat);
+  batchUpdatePeople: (vec record {
+                            nat;
+                            text;
+                            float64;
+                          }) -> (bool);
   getBillDetails: () ->
    (record {
       billAmount: opt float64;
@@ -14,5 +19,5 @@ service : {
     }) query;
   removePerson: (nat) -> (bool);
   setBillAmount: (float64) -> ();
-  updatePercentage: (nat, float64) -> (bool);
+  updatePerson: (nat, text, float64) -> (bool);
 }
